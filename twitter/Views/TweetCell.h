@@ -17,9 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel *displayName;
 @property (weak, nonatomic) IBOutlet UILabel *userName;
 @property (weak, nonatomic) IBOutlet UILabel *tweetText;
-@property (weak, nonatomic) IBOutlet UILabel *replyNum;
-@property (weak, nonatomic) IBOutlet UILabel *rtwtNum;
-@property (weak, nonatomic) IBOutlet UILabel *likeNum;
+@property (weak, nonatomic) IBOutlet UIButton *reply;
+@property (weak, nonatomic) IBOutlet UIButton *rtwt;
+@property (weak, nonatomic) IBOutlet UIButton *likes;
+@property (weak, nonatomic) IBOutlet UIButton *messageButton;
 @end
 
 NS_ASSUME_NONNULL_END

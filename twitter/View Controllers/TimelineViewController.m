@@ -12,16 +12,10 @@
 #import "LoginViewController.h"
 #import "TweetCell.h"
 #import "Tweet.h"
+#import "ComposeViewController.h"
+@interface TimelineViewController () <ComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate>
 
-@interface TimelineViewController ()<UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UIImageView *profilePic;
-@property (weak, nonatomic) IBOutlet UILabel *displayName;
-@property (weak, nonatomic) IBOutlet UILabel *userName;
-@property (weak, nonatomic) IBOutlet UILabel *tweetText;
-@property (weak, nonatomic) IBOutlet UILabel *replyNum;
-@property (weak, nonatomic) IBOutlet UILabel *rtwtNum;
-@property (weak, nonatomic) IBOutlet UILabel *likeNum;
 @property (weak, nonatomic) IBOutlet UIButton *logoutButton;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 - (IBAction)didTapLogout:(id)sender;
@@ -34,6 +28,15 @@
     [super viewDidLoad];
     
     
+    // Get timeline
+    [self fetchTweets];
+    // Initialize a UIRefreshControl
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(beginRefresh:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView insertSubview:self.refreshControl atIndex:0];
+}
+
+- (void)fetchTweets {
     // Get timeline
     [[APIManager shared] getHomeTimelineWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
@@ -54,10 +57,6 @@
             NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
         }
     }];
-    // Initialize a UIRefreshControl
-   self.refreshControl = [[UIRefreshControl alloc] init];
-   [self.refreshControl addTarget:self action:@selector(beginRefresh:) forControlEvents:UIControlEventValueChanged];
-    [self.tableView insertSubview:self.refreshControl atIndex:0];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -76,10 +75,33 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
     cell.tweet = self.arrayOfTweets[indexPath.row];
-    NSLog(@"%@", cell.tweet);
+    Tweet* twt=self.arrayOfTweets[indexPath.row];
     cell.displayName.text = cell.tweet.user.name;
     cell.userName.text = cell.tweet.user.screenName;
     cell.tweetText.text = cell.tweet.text;
+    //rtwt text and image setup
+    [cell.rtwt setTitle:[NSString stringWithFormat:@"%d", twt.retweetCount] forState:UIControlStateNormal];
+
+    if(cell.tweet.retweeted){
+        UIImage *btnImage = [UIImage imageNamed:@"retweet-icon-green"];
+        [cell.rtwt setImage:btnImage forState:UIControlStateNormal];
+    }else{
+        UIImage *btnImage = [UIImage imageNamed:@"retweet-icon"];
+        [cell.rtwt setImage:btnImage forState:UIControlStateNormal];
+    }
+    //likes text and image setup
+    [cell.likes setTitle:[NSString stringWithFormat:@"%d", twt.favoriteCount] forState:UIControlStateNormal];
+    if(cell.tweet.favorited){
+        UIImage *btnImage = [UIImage imageNamed:@"favor-icon-red"];
+        [cell.likes setImage:btnImage forState:UIControlStateNormal];
+    }else{
+        UIImage *btnImage = [UIImage imageNamed:@"favor-icon"];
+        [cell.likes setImage:btnImage forState:UIControlStateNormal];
+    }
+    //reply button should not have text
+    cell.reply.titleLabel.text = NULL;
+    //message button should not have text
+    cell.messageButton.titleLabel.text = NULL;
     NSString *URLString = cell.tweet.user.profilePicture;
     NSURL *url = [NSURL URLWithString:URLString];
     NSData *urlData = [NSData dataWithContentsOfURL:url];
@@ -100,7 +122,7 @@
 //            }
             // TimelineViewController.m
             self.arrayOfTweets = (NSMutableArray*)tweets;
-            
+            [self fetchTweets];
             NSLog(@"%@", self.arrayOfTweets);
 
         } else {
@@ -110,15 +132,22 @@
     }];
     
 }
-/*
+
+- (void)didTweet:(Tweet *)tweet{
+    [self fetchTweets];
+    [self.presentedViewController dismissViewControllerAnimated:YES completion:^{
+            
+    }];
+}
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    UINavigationController *navigationController = [segue destinationViewController];
+        ComposeViewController *composeController = (ComposeViewController*)navigationController.topViewController;
+        composeController.delegate = self;
 }
-*/
 
 
 - (IBAction)didTapLogout:(id)sender {
