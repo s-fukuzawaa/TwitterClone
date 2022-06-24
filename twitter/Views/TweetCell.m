@@ -8,6 +8,7 @@
 
 #import "TweetCell.h"
 #import "APIManager.h"
+#import "NSDate+DateTools.h"
 
 @implementation TweetCell
 - (IBAction)didTapFavorite:(id)sender {
@@ -106,12 +107,77 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    UITapGestureRecognizer *profileTapGestureRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTapUserProfile:)];
+    [self.profilePic addGestureRecognizer:profileTapGestureRecognizer];
+    [self.profilePic setUserInteractionEnabled:YES];
+
+}
+
+- (void)setTweet:(Tweet *)tweet {
+// Since we're replacing the default setter, we have to set the underlying private storage _movie ourselves.
+// _movie was an automatically declared variable with the @propery declaration.
+// You need to do this any time you create a custom setter.
+
+    _tweet = tweet;
+    // assign date
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"E MMM d HH:mm:ss Z y";
+    self.date = [formatter dateFromString:self.tweet.createdAtString];
+    [self formatDate];
+    // main name
+    self.displayName.text = self.tweet.user.name;
+    // username
+    self.userName.text = [@"@" stringByAppendingString:self.tweet.user.screenName];
+    // tweet body
+    self.tweetText.text = self.tweet.text;
+    //Stretch goal: link
+    NSObject *entities = self.tweet.entities[@"urls"][0];
+    
+    //rtwt text and image setup
+    [self.rtwt setTitle:[NSString stringWithFormat:@"%d", self.tweet.retweetCount] forState:UIControlStateNormal];
+
+    if(self.tweet.retweeted){
+        UIImage *btnImage = [UIImage imageNamed:@"retweet-icon-green"];
+        [self.rtwt setImage:btnImage forState:UIControlStateNormal];
+    }else{
+        UIImage *btnImage = [UIImage imageNamed:@"retweet-icon"];
+        [self.rtwt setImage:btnImage forState:UIControlStateNormal];
+    }
+    //likes text and image setup
+    [self.likes setTitle:[NSString stringWithFormat:@"%d", self.tweet.favoriteCount] forState:UIControlStateNormal];
+    if(self.tweet.favorited){
+        UIImage *btnImage = [UIImage imageNamed:@"favor-icon-red"];
+        [self.likes setImage:btnImage forState:UIControlStateNormal];
+    }else{
+        UIImage *btnImage = [UIImage imageNamed:@"favor-icon"];
+        [self.likes setImage:btnImage forState:UIControlStateNormal];
+    }
+    //reply button should not have text
+    [self.reply setTitle:@"" forState:UIControlStateNormal];
+    //message button should not have text
+    [self.messageButton setTitle:@"" forState:UIControlStateNormal];
+    //set profile picture
+    NSString *URLString = self.tweet.user.profilePicture;
+    NSURL *url = [NSURL URLWithString:URLString];
+    NSData *urlData = [NSData dataWithContentsOfURL:url];
+    [self.profilePic setImage: [UIImage imageWithData:urlData]];
+    
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
+}
+
+- (void) formatDate {
+    [self.dateLabel setText: [@" · " stringByAppendingString:[self.date shortTimeAgoSinceNow]]];
+}
+
+- (void) didTapUserProfile:(UITapGestureRecognizer *)sender{
+    //TODO: Call method delegate
+    [self.delegate tweetCell:self didTap:self.tweet.user];
+
 }
 
 @end

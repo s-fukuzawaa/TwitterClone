@@ -8,6 +8,7 @@
 
 #import "APIManager.h"
 #import "Tweet.h"
+#import "User.h"
 
 static NSString * const baseURLString = @"https://api.twitter.com";
 
@@ -62,7 +63,9 @@ static NSString * const baseURLString = @"https://api.twitter.com";
            // Success
            NSMutableArray *tweets = [Tweet tweetsWithArray:tweetDictionaries];
            completion(tweets, nil);
-        NSLog(@"%@",tweets);
+        for(Tweet* twt in tweets){
+            NSLog(@"%@", twt.text);
+        }
 //        [task resume];
        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
            // There was a problem
@@ -70,6 +73,7 @@ static NSString * const baseURLString = @"https://api.twitter.com";
     }
     
     ];
+    
 }
 
 // TODO: Post Composed Tweet Method
@@ -84,6 +88,63 @@ static NSString * const baseURLString = @"https://api.twitter.com";
         completion(nil, error);
     }];
 }
+- (void)postStatusWithTextReply:(NSString *)text status_id: (NSString *) status_id completion:(void (^)(Tweet *, NSError *))completion {
+    NSString *urlString = @"1.1/statuses/update.json";
+    NSDictionary *parameters = @{@"status": text, @"in_reply_to_status_id": status_id};
+    
+    [self POST:urlString parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable tweetDictionary) {
+        Tweet *tweet = [[Tweet alloc]initWithDictionary:tweetDictionary];
+        completion(tweet, nil);
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        completion(nil, error);
+    }];
+}
+
+- (void)getUser:(void(^)(NSDictionary *userDict, NSError *error))completion {
+    
+    [self GET:@"1.1/account/settings.json"
+        parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable temp) {
+           // Success
+//           NSString *screenName = temp[@"screen_name"];
+//        NSLog(@"HEYYYEEYEHEH");
+//        NSLog(@"%@",screenName);
+           completion(temp, nil);
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+   }];
+}
+
+- (void)getMyself:(NSString*) username completion:(void(^)(User *user, NSError *error)) completion{
+    NSString* getString = [@"1.1/users/show.json?screen_name=" stringByAppendingString:username];
+    [self GET:getString
+        parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable userDict) {
+        // Success
+        User *user = [[User alloc]initWithDictionary:userDict];
+        NSLog(@"HEYYYEEYEHEH");
+        completion(user, nil);
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+   }];
+}
+
+//GET https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&count=2
+- (void)getUserTimeline:(NSString*) username completion:(void(^)(NSArray *tweets, NSError *error)) completion{
+    NSString* getString = [@"1.1/statuses/user_timeline.json?screen_name=" stringByAppendingString:username];
+    // Create a GET Request
+    [self GET:getString
+       parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSArray *  _Nullable tweetDictionaries) {
+           // Success
+           NSMutableArray *tweets = [Tweet tweetsWithArray:tweetDictionaries];
+           completion(tweets, nil);
+//        [task resume];
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+    }];
+}
+
 
 - (void)favorite:(Tweet *)tweet completion:(void (^)(Tweet *, NSError *))completion {
 
