@@ -38,27 +38,16 @@
     [self.refreshControl addTarget:self action:@selector(beginRefresh:) forControlEvents:UIControlEventValueChanged];
     [self.tableView insertSubview:self.refreshControl atIndex:0];
 }
-//- (void) viewDidAppear:(BOOL) animated{
-//    [super viewDidAppear: animated];
-//    // Get timeline
-//    [self fetchTweets];
-//}
-
 - (void)fetchTweets {
     // Get timeline
     [[APIManager shared] getHomeTimelineWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             NSLog(@"😎😎😎 Successfully loaded home timeline");
-            for (Tweet *dictionary in tweets) {
-//                NSString *text = dictionary[@"text"];
-                NSLog(@"%@", dictionary.text);
-            }
             // TimelineViewController.m
             self.arrayOfTweets = (NSMutableArray*)tweets;
             self.tableView.dataSource = self;
             self.tableView.delegate = self;
 
-//            NSLog(@"%@", self.arrayOfTweets);
             [self.tableView reloadData];
             self.tableView.rowHeight = UITableViewAutomaticDimension;
 

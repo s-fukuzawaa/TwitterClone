@@ -15,6 +15,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *name;
 @property (weak, nonatomic) IBOutlet UILabel *username;
 @property (weak, nonatomic) IBOutlet UILabel *twtContent;
+@property (weak, nonatomic) IBOutlet UITextView *twtContentLink;
+
 @property (weak, nonatomic) IBOutlet UILabel *date;
 @property (weak, nonatomic) IBOutlet UILabel *retweet;
 @property (weak, nonatomic) IBOutlet UILabel *likes;
@@ -36,6 +38,21 @@
     self.username.text = [@"@" stringByAppendingString:self.tweet.user.screenName];
     // tweet body
     self.twtContent.text = self.tweet.text;
+    NSString *body = self.tweet.text;
+    NSDataDetector *detect = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeLink error:nil];
+    NSArray *matches = [detect matchesInString:body options:0 range:NSMakeRange(0, [body length])];
+    if(matches.count!=0){
+        for(NSTextCheckingResult* link in matches){
+            NSMutableAttributedString * str = [[NSMutableAttributedString alloc] initWithString:self.tweet.text];
+            NSRange range = [self.tweet.text rangeOfString:link.URL.absoluteString];
+            [str addAttribute: NSLinkAttributeName value:link.URL range: range];
+            self.twtContentLink.attributedText = str;
+        }
+        
+
+    }else{
+        self.twtContentLink.text = self.tweet.text;
+    }
     //rtwt text setup
     self.retweet.text = [NSString stringWithFormat:@"%d", self.tweet.retweetCount];
     if(self.tweet.retweetCount==1){

@@ -42,7 +42,6 @@
     
     [[APIManager shared] getUser:^(NSDictionary *userDict, NSError *error) {
             if (userDict) {
-                NSLog(@"SCNREE NAME");
                 self.myUsername = userDict[@"screen_name"];
                 [[APIManager shared] getMyself:self.myUsername completion:^(User *user, NSError *error) {
                     if (user) {

@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "Tweet.h"
 #import "User.h"
+#import "FRHyperLabel.h"
+
 NS_ASSUME_NONNULL_BEGIN
 @protocol TweetCellDelegate;
 
@@ -19,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel *displayName;
 @property (weak, nonatomic) IBOutlet UILabel *userName;
 @property (weak, nonatomic) IBOutlet UILabel *tweetText;
+@property (weak, nonatomic) IBOutlet UITextView *tweetTextLink;
 @property (weak, nonatomic) IBOutlet UIButton *reply;
 @property (weak, nonatomic) IBOutlet UIButton *rtwt;
 @property (weak, nonatomic) IBOutlet UIButton *likes;

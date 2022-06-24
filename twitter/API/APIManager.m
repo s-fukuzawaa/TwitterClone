@@ -66,7 +66,6 @@ static NSString * const baseURLString = @"https://api.twitter.com";
         for(Tweet* twt in tweets){
             NSLog(@"%@", twt.text);
         }
-//        [task resume];
        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
            // There was a problem
            completion(nil, error);
@@ -100,14 +99,12 @@ static NSString * const baseURLString = @"https://api.twitter.com";
     }];
 }
 
+// Get info about user -- used for getting username
 - (void)getUser:(void(^)(NSDictionary *userDict, NSError *error))completion {
     
     [self GET:@"1.1/account/settings.json"
         parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable temp) {
            // Success
-//           NSString *screenName = temp[@"screen_name"];
-//        NSLog(@"HEYYYEEYEHEH");
-//        NSLog(@"%@",screenName);
            completion(temp, nil);
        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
            // There was a problem
@@ -115,13 +112,13 @@ static NSString * const baseURLString = @"https://api.twitter.com";
    }];
 }
 
+// Get info about myself -- used for getting profile pic
 - (void)getMyself:(NSString*) username completion:(void(^)(User *user, NSError *error)) completion{
     NSString* getString = [@"1.1/users/show.json?screen_name=" stringByAppendingString:username];
     [self GET:getString
         parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable userDict) {
         // Success
         User *user = [[User alloc]initWithDictionary:userDict];
-        NSLog(@"HEYYYEEYEHEH");
         completion(user, nil);
        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
            // There was a problem
@@ -129,7 +126,7 @@ static NSString * const baseURLString = @"https://api.twitter.com";
    }];
 }
 
-//GET https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&count=2
+// Get the specific user's timeline
 - (void)getUserTimeline:(NSString*) username completion:(void(^)(NSArray *tweets, NSError *error)) completion{
     NSString* getString = [@"1.1/statuses/user_timeline.json?screen_name=" stringByAppendingString:username];
     // Create a GET Request
@@ -138,7 +135,6 @@ static NSString * const baseURLString = @"https://api.twitter.com";
            // Success
            NSMutableArray *tweets = [Tweet tweetsWithArray:tweetDictionaries];
            completion(tweets, nil);
-//        [task resume];
        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
            // There was a problem
            completion(nil, error);

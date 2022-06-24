@@ -9,6 +9,7 @@
 #import "TweetCell.h"
 #import "APIManager.h"
 #import "NSDate+DateTools.h"
+#import "FRHyperLabel.h"
 
 @implementation TweetCell
 - (IBAction)didTapFavorite:(id)sender {
@@ -130,8 +131,20 @@
     self.userName.text = [@"@" stringByAppendingString:self.tweet.user.screenName];
     // tweet body
     self.tweetText.text = self.tweet.text;
-    //Stretch goal: link
-    NSObject *entities = self.tweet.entities[@"urls"][0];
+
+    NSString *body = self.tweet.text;
+    NSDataDetector *detect = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeLink error:nil];
+    NSArray *matches = [detect matchesInString:body options:0 range:NSMakeRange(0, [body length])];
+    if(matches.count!=0){
+        for(NSTextCheckingResult* link in matches){
+            NSMutableAttributedString * str = [[NSMutableAttributedString alloc] initWithString:self.tweet.text];
+            NSRange range = [self.tweet.text rangeOfString:link.URL.absoluteString];
+            [str addAttribute: NSLinkAttributeName value:link.URL range: range ];
+            self.tweetTextLink.attributedText = str;
+        }
+    }else{
+        self.tweetTextLink.text = self.tweet.text;
+    }
     
     //rtwt text and image setup
     [self.rtwt setTitle:[NSString stringWithFormat:@"%d", self.tweet.retweetCount] forState:UIControlStateNormal];

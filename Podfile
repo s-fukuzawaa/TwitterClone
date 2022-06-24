@@ -10,7 +10,7 @@ target 'twitter' do
   pod 'BDBOAuth1Manager'
   pod 'DateTools'
   pod 'UITextView+Placeholder'
-
+  pod 'FRHyperLabel'
 end
 
 post_install do |installer|
