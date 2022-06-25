@@ -144,6 +144,8 @@
         }
     }else{
         self.tweetTextLink.text = self.tweet.text;
+        NSMutableAttributedString * str = [[NSMutableAttributedString alloc] initWithString:self.tweet.text];
+        self.tweetTextLink.attributedText = str;
     }
     
     //rtwt text and image setup

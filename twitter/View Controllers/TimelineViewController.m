@@ -112,7 +112,6 @@
         ProfileViewController *profileVC = [segue destinationViewController];
         User* user = sender;
         profileVC.user = user;
-        NSLog(@"%@",profileVC.user.screenName);
     }else if([segue.identifier isEqualToString:@"replySegue"]){
         NSIndexPath *indexPath = [self.tableView indexPathForCell:(TweetCell *)sender];
         UINavigationController *navigationController = [segue destinationViewController];

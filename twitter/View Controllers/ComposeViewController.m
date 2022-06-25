@@ -34,7 +34,7 @@
 
     self.twtView.layer.borderColor = [[UIColor systemBlueColor] CGColor];
     // set wordcount label
-    self.wordCount.text = @"0/140";
+    self.wordCount.text = @"0/280";
     self.wordCount.textColor = [UIColor systemBlueColor];
     if(self.username !=NULL){
         self.twtView.text = [@"@" stringByAppendingString:self.username];
@@ -45,7 +45,6 @@
                 self.myUsername = userDict[@"screen_name"];
                 [[APIManager shared] getMyself:self.myUsername completion:^(User *user, NSError *error) {
                     if (user) {
-                        NSLog(@"%@", user);
                         
                         NSString *URLString = user.profilePicture;
 
@@ -93,17 +92,17 @@
 }
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
     // Set the max character limit
-    int characterLimit = 140;
+    int characterLimit = 280;
 
     // Construct what the new text would be if we allowed the user's latest edit
     NSString *newText = [self.twtView.text stringByReplacingCharactersInRange:range withString:text];
 
     // TODO: Update character count label
     if(newText.length<characterLimit){
-        self.wordCount.text = [NSString stringWithFormat:@"%lu/140",newText.length];
+        self.wordCount.text = [NSString stringWithFormat:@"%lu/280",newText.length];
         self.wordCount.textColor = [UIColor systemBlueColor];
     }else{
-        self.wordCount.text = @"140/140";
+        self.wordCount.text = @"280/280";
         self.wordCount.textColor = [UIColor redColor];
     }
 
